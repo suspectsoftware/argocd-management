@@ -1,0 +1,166 @@
+fullnameOverride: argocd
+
+global:
+  domain: argo.suspectsoftware.com
+
+controller:
+  replicas: 1
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  pdb:
+    enabled: false
+    minAvailable: 1
+  podLabels: {}
+
+dex:
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+redis:
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+repoServer:
+  replicas: 2
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+applicationSet:
+  replicas: 1
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+server:
+  replicas: 1
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+  podLabels: {}
+
+  service:
+    annotations:
+      load-balancer.hetzner.cloud/location: hel1  # Ensures the load balancer is in the same network zone as your nodes
+      load-balancer.hetzner.cloud/use-private-ip: "true"  # Routes traffic between the load balancer and nodes through the private network
+    type: LoadBalancer
+    servicePortHttp: 80
+    servicePortHttps: 443
+    servicePortHttpName: http
+    servicePortHttpsName: https
+    # -- Denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints
+    ## Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    externalTrafficPolicy: Cluster
+    sessionAffinity: None # Supports `ClientIP` and `None`
+
+  # httproute:
+  #   enabled: true
+  #   hostnames:
+  #     - argo.suspectsoftware.com
+  #   parentRefs:
+  #     - group: gateway.networking.k8s.io
+  #       kind: Gateway
+  #       name: envoy-gateway
+  #       namespace: envoy-gateway-system
+
+  # ingress:
+  #   # -- Enable an ingress resource for the Argo CD server
+  #   enabled: false
+  #   # -- Additional ingress annotations
+  #   annotations:
+  #     cert-manager.io/cluster-issuer: cluster-issuer
+  #     nginx.ingress.kubernetes.io/rewrite-target: /
+  #     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  #     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  #   # -- Additional ingress labels
+  #   labels: {}
+  #   # -- Defines which ingress controller will implement the resource
+  #   ingressClassName: "nginx" # point to the ingress controller
+
+  #   # -- List of ingress hosts
+  #   ## Argo Ingress.
+  #   ## Hostnames must be provided if Ingress is enabled.
+  #   ## Secrets must be manually created in the namespace
+  #   hostname: argo.suspectsoftware.com
+
+  #   # -- Ingress TLS configuration
+  #   extraTls:
+  #     - secretName: argo-tls-secret
+  #       hosts:
+  #         - argo.suspectsoftware.com
+
+configs:
+  params:
+    server.insecure: true
+    server.log.level: debug
+  # rbac:
+  #   create: true
+  #   policy.default: ""
+  #   policy.csv: |
+  #     p, role:org-admin, applications, *, */*, allow
+  #     p, role:org-admin, applications, *, *, allow
+  #     p, role:org-admin, clusters, *, *, allow
+  #     p, role:org-admin, repositories, *, *, allow
+  #     p, role:org-admin, applicationsets, *, */*, allow
+  #     p, role:org-admin, logs, *, */*, allow
+  #     p, role:org-admin, exec, *, */*, allow
+  #     p, role:org-admin, projects, *, *, allow
+  #     p, role:org-admin, *, *, *, allow
+  #     p, role:org-admin, *, *, */*, allow
+  #     g, "d878baa3-157b-46fc-9500-9536fccdfaa7", role:org-admin
+  # cm:
+  #   ui.bannercontent: "Test"
+  #   ui.bannerpermanent: "true"
+  #   ui.bannerposition: "top"
+  #   url: https://argo.suspectsoftware.com
+  #   create: true
+  #   admin.enabled: false
+  #   exec.enabled: true
+  #   application.resourceTrackingMethod: annotation
+  #   dex.config: |
+  #     logger:
+  #       level: debug
+  #       format: json
+  #     connectors:
+  #       - type: saml
+  #         id: saml
+  #         name: saml
+  #         config:
+  #           entityIssuer: https://argo-test.cloud.egmont.com/api/dex/callback
+  #           ssoURL: https://login.microsoftonline.com/d5dfa732-4450-4094-a0f9-50bd719272da/saml2
+  #           caData: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM4RENDQWRpZ0F3SUJBZ0lRVzM5SExTTjN4WVpPU2dIeEQxMWxHakFOQmdrcWhraUc5dzBCQVFzRkFEQTBNVEl3TUFZRFZRUUQKRXlsTmFXTnliM052Wm5RZ1FYcDFjbVVnUm1Wa1pYSmhkR1ZrSUZOVFR5QkRaWEowYVdacFkyRjBaVEFlRncweU5EQXhNak15TVRRMgpNRFphRncweU56QXhNak15TVRRMk1ETmFNRFF4TWpBd0JnTlZCQU1US1UxcFkzSnZjMjltZENCQmVuVnlaU0JHWldSbGNtRjBaV1FnClUxTlBJRU5sY25ScFptbGpZWFJsTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF2aGFBZm04L2ovdGkKSFJWYURPR3BOSXhScFJubDRhQUk0aHRjRWUyTTJaMFFKeWNWa3NTdW81dU1TKzhaTVlYWS9LUHBsZmdUTFkwc0RDMWxkeHdNNVljdApNbTV6UFQvM3J3aFFvZm95T1paQ21iNndOYXBPM3BHSmZOdWJ3eDRSMXNrekhXTGNFVFI3anZ2bU12QmJVQzA5Znl4b1VRS3krbEhqCnlNVGFzUk96VW04NXR5MmFWQVBqU0N6Wm5FY1hxaFBvaTl2SVVuenU3MUtKV2ZQeTNyM0xVZkxHQW1FaVhlaXR5amcwb3ZjSkswQVoKWDdwdituQ292WEpJTXlETVVLVDBpZnNZNHNrN3VVd0s1Y2huQnBvUzRvOXloajVtc2ZOK00reC9udVIrS2w2OUUyWG13NUoycGZxcwpyZXlJblZTMzh5azFPcDV6MUZBVHdjTkxBUUlEQVFBQk1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQnVYTUlaR21KUi9xN3ZTSVJKCnV1aDZKVGpWQ1VEdnZvREhvRkJCdWJvc3ZZVUFZa1E1UU1JL2xpbit2eWV0UlpscjNUTEp5WXZqczQ0YjRYQ0JxaGYwQ3RmUXAxbkcKWmsvR0VDL0FhcUJsdm9reE56V3JtSXRkVkZxaFZsRWNFVXFDWmxOUW1vMEw4b0RScS9iZDBtdHA0Z3lsQ0U0UnJUcmltbDhQRHFmQQpuSnB6RjVmVlBhZXkyOUYwZDNmTmFndVFhVkl1d1dBLzlKTytVaEdVeUlIMk56RGNROGU0VVBMdFNVeW1qeU1MYWt3WHFxemNtbTBqCjdYMGdRbkR0ZkI4bUpKMzVkNWlUcVd0ZmhaRkpqMm0vNytBQlBySmxnVkdJY0ozVHNFRFBqazFhbWlhb2FlSkZtOUVtS1c3ckVhQ1IKU05lZzhiU2xMRm9iU1BtMHh4SmQKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoK
+  #           redirectURI: https://argo-test.cloud.egmont.com/api/dex/callback
+  #           usernameAttr: email
+  #           emailAttr: email
+  #           groupsAttr: Group

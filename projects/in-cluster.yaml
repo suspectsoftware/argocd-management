@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: in-cluster
+  namespace: argocd
+spec:
+  description: "Cluster creator project"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      name: 'in-cluster'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
