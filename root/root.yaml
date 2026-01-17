@@ -6,8 +6,8 @@ metadata:
 spec:
   project: in-cluster
   sources:
-    # - repoURL: "https://github.com/suspectsoftware/argo-management-cluster.git"
-    #   path: management-test/applicationsets
+    - repoURL: "https://github.com/suspectsoftware/argocd-management.git"
+      path: applicationsets
     - repoURL: "https://github.com/suspectsoftware/argocd-management.git"
       path: root
   destination:
