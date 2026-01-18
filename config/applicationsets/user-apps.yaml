@@ -9,11 +9,11 @@ spec:
         repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
         revision: HEAD
         files:
-          - path: "apps/*"
+          - path: "apps/*.yaml"
   template:
     metadata:
-      name: 'user-app-{{path.filename | replace ".yaml" ""}}'
-      namespace: '{{path.filename | replace ".yaml" ""}}'
+      name: 'user-app-{{path.basename}}'
+      namespace: '{{path.basename}}'
     spec:
       project: team-alpha
       source:
@@ -22,10 +22,10 @@ spec:
         path: charts/webapp
         helm:
           valueFiles:
-            - '../../{{path}}/{{path.filename}}'
+            - '../../{{path}}'
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: 'app-{{path.filename | replace ".yaml" ""}}'
+        namespace: 'app-{{path.basename}}'
       syncPolicy:
         automated:
           prune: true
