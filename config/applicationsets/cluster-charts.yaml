@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-charts
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/suspectsoftware/argocd-management.git
+              revision: HEAD
+              files:
+                - path: config/cluster-charts/_installed.yaml
+          - list:
+              elementsYaml: "{{ .charts | toJson }}"
+  template:
+    metadata:
+      name: 'cluster-chart-{{ dig "releaseName" .chart . }}'
+    spec:
+      project: cluster-charts
+      sources: []
+      destination:
+        name: in-cluster
+        namespace: '{{ dig "namespace" .chart . }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+  templatePatch: |
+
+    spec:
+      sources:
+        - repoURL: https://github.com/suspectsoftware/argocd-management.git
+          targetRevision: HEAD
+          ref: local
+        - chart: '{{ .chart }}'
+          repoURL: '{{ dig "repositoryUrl" "replace-me" . }}'
+          targetRevision: '{{ dig "version" "replace-me" . }}'
+          helm:
+            releaseName: '{{ dig "releaseName" .chart . }}'
+            valueFiles:
+              - $local/config/cluster-charts/{{ dig "releaseName" .chart . }}.yaml

@@ -1,0 +1,6 @@
+charts:
+  - chart: prometheus
+    releaseName: prometheus
+    namespace: prometheus
+    version: "27.28.0"
+    repositoryUrl: "https://prometheus-community.github.io/helm-charts"

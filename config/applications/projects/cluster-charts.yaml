@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cluster-charts
+  namespace: argocd
+spec:
+  description: "Cluster charts project"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      name: 'in-cluster'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
