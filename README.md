@@ -63,48 +63,14 @@ And we can then apply the root application which in turn creates all underlying 
 kubectl apply -f root/root.yaml
 ```
 
+## User Apps
 
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: argocd-secret
-  namespace: argocd
-spec:
-  refreshInterval: 1h
-  secretStoreRef:
-    kind: ClusterSecretStore
-    name: cluster-store
-  target:
-    name: argocd-secret
-    labels:
-      app.kubernetes.io/name: argocd-secret
-      app.kubernetes.io/part-of: argocd
-    template:
-      type: Opaque
-      data:
-        server.secretkey: "{{ .SecretKey | toString }}"
-        dex.google.clientID: "{{ .clientID | toString }}"
-        dex.google.clientSecret: "{{ .clientSecret | toString }}"
-  data:
-    - secretKey: SecretKey
-      remoteRef:
-        key: argocd-server-secretkey/secretkey
-    - secretKey: clientID
-      remoteRef:
-        key: google-workspace-argo-oidc/client-id
-    - secretKey: clientSecret
-      remoteRef:
-        key: google-workspace-argo-oidc/client-secret
-
-kubectl apply -f - << 'EOF'
-apiVersion: v1
-kind: Secret
-metadata:
-  name: argocd-secret
-  namespace: argocd
-type: Opaque
-stringData:
-  server.secretkey: REDACTED
-  dex.google.clientID: 397131616114-9590v8jefbn29td8kft38mtm918pb8ll.apps.googleusercontent.com
-  dex.google.clientSecret: REDACTED
-EOF
+I want to use a Helm chart to deploy multiple copies of the same application to my cluster.
+A values file should specify the differences between each deployment.
+In my apps directory i have three example values file, these represent each unique app.
+I want to create an applicationset which creates an argocd application for each values file.
+It should be created in a namespace with the same name as the file, so app-01.yaml becomes app-01 in kubernetes.
+And the name of the application should use the same standard prefixed with user-app.
+the applicationset should be placed in config/applicationsets
+The chart to use is right now apps/chart
+The root dir of my project is /Users/daerjo/Documents/repositories/private/hetzner-argocd/argocd-management
