@@ -40,6 +40,23 @@ stringData:
 EOF
 ```
 
+Since external secrets is used to retrieve all sensitive data in the cluster, we need to setup the secret to access it.
+In this project we use 1Password which does not have OIDC support, so we need to create the `eso-1password-credentials` secret.
+We can later loop back and manage this secret with external-secrets to make rotation easier.
+
+```
+kubectl apply -f - << 'EOF'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eso-1password-credentials
+  namespace: external-secrets
+type: Opaque
+stringData:
+  token: <1PASSWORD_API_TOKEN>
+EOF
+```
+
 And we can then apply the root application which in turn creates all underlying applications
 
 ```

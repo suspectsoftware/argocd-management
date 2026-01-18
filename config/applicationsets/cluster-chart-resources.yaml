@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: projects
+  name: cluster-chart-resources
   namespace: argocd
   annotations:
     argocd.argoproj.io/manifest-generate-paths: .
 spec:
-  project: in-cluster
+  project: cluster-charts
   source:
     repoURL: https://github.com/suspectsoftware/argocd-management.git
-    path: config/projects
+    path: config/cluster-charts/resources
     directory:
       recurse: true
   destination:
     name: in-cluster
-    namespace: argocd
+    # namespace: argocd
   syncPolicy:
     automated:
       selfHeal: true

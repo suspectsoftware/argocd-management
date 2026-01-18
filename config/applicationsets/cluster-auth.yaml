@@ -9,7 +9,7 @@ spec:
   project: in-cluster
   source:
     repoURL: "https://github.com/suspectsoftware/argocd-management.git"
-    path: config/applications/cluster-auth
+    path: config/cluster-auth
   destination:
     name: in-cluster
     namespace: argocd
