@@ -16,10 +16,25 @@ spec:
       namespace: 'app-{{path.basename}}'
     spec:
       project: team-alpha
-      source:
-        repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
-        targetRevision: HEAD
-        path: charts/webapp
+      sources:
+        - repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
+          targetRevision: HEAD
+          path: charts/webapp
+          helm:
+            valueFiles:
+              - '$values/{{path.basename}}/values.yaml'
+        - repoURL: 'https://github.com/suspectsoftware/argocd-solution-alpha.git'
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'app-{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
         helm:
           valueFiles:
             - '../../{{path.basename}}/values.yaml'
