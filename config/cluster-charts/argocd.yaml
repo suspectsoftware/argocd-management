@@ -117,7 +117,7 @@ configs:
   cm:
     url: https://argo.suspectsoftware.com
     create: true
-    admin.enabled: true
+    admin.enabled: false
     exec.enabled: true
     application.resourceTrackingMethod: annotation
     dex.config: |
