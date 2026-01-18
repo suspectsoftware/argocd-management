@@ -12,8 +12,8 @@ spec:
           - path: "apps/*"
   template:
     metadata:
-      name: 'user-app-{{path.basename}}'
-      namespace: '{{path.basename}}'
+      name: 'user-app-{{path.filenameNormalized}}'
+      namespace: '{{path.filenameNormalized}}'
     spec:
       project: team-alpha
       source:
@@ -25,7 +25,7 @@ spec:
             - '../../{{path}}'
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: 'app-{{path.basename}}'
+        namespace: 'app-{{path.filenameNormalized}}'
       syncPolicy:
         automated:
           prune: true
