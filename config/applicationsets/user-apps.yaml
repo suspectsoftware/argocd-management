@@ -8,7 +8,7 @@ spec:
     - git:
         repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
         revision: HEAD
-        directory:
+        directories:
           - path: "apps/*"
   template:
     metadata:
