@@ -62,3 +62,49 @@ And we can then apply the root application which in turn creates all underlying 
 ```
 kubectl apply -f root/root.yaml
 ```
+
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: argocd-secret
+  namespace: argocd
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: cluster-store
+  target:
+    name: argocd-secret
+    labels:
+      app.kubernetes.io/name: argocd-secret
+      app.kubernetes.io/part-of: argocd
+    template:
+      type: Opaque
+      data:
+        server.secretkey: "{{ .SecretKey | toString }}"
+        dex.google.clientID: "{{ .clientID | toString }}"
+        dex.google.clientSecret: "{{ .clientSecret | toString }}"
+  data:
+    - secretKey: SecretKey
+      remoteRef:
+        key: argocd-server-secretkey/secretkey
+    - secretKey: clientID
+      remoteRef:
+        key: google-workspace-argo-oidc/client-id
+    - secretKey: clientSecret
+      remoteRef:
+        key: google-workspace-argo-oidc/client-secret
+
+kubectl apply -f - << 'EOF'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-secret
+  namespace: argocd
+type: Opaque
+stringData:
+  server.secretkey: REDACTED
+  dex.google.clientID: 397131616114-9590v8jefbn29td8kft38mtm918pb8ll.apps.googleusercontent.com
+  dex.google.clientSecret: REDACTED
+EOF
