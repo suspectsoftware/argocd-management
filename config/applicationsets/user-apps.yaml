@@ -8,12 +8,12 @@ spec:
     - git:
         repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
         revision: HEAD
-        files:
-          - path: "apps/*.yaml"
+        directory:
+          - path: "apps/*"
   template:
     metadata:
       name: 'user-app-{{path.basename}}'
-      namespace: '{{path.basename}}'
+      namespace: 'app-{{path.basename}}'
     spec:
       project: team-alpha
       source:
@@ -22,7 +22,7 @@ spec:
         path: charts/webapp
         helm:
           valueFiles:
-            - '../../{{path}}'
+            - '../../apps/{{path.basename}}/values.yaml'
       destination:
         server: 'https://kubernetes.default.svc'
         namespace: 'app-{{path.basename}}'
