@@ -53,7 +53,7 @@ metadata:
   namespace: external-secrets
 type: Opaque
 stringData:
-  token: <1PASSWORD_API_TOKEN>
+  token: <1PASSWORD_SA_TOKEN>
 EOF
 ```
 
