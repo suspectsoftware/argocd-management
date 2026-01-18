@@ -6,10 +6,10 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
+        repoURL: 'https://github.com/suspectsoftware/argocd-solution-alpha.git'
         revision: HEAD
         directories:
-          - path: "apps/*"
+          - path: "*"
   template:
     metadata:
       name: 'user-app-{{path.basename}}'
@@ -22,7 +22,7 @@ spec:
         path: charts/webapp
         helm:
           valueFiles:
-            - '../../apps/{{path.basename}}/values.yaml'
+            - '../../{{path.basename}}/values.yaml'
       destination:
         server: 'https://kubernetes.default.svc'
         namespace: 'app-{{path.basename}}'
