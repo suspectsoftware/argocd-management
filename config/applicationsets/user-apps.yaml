@@ -9,8 +9,7 @@ spec:
         repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
         revision: HEAD
         files:
-          - path: "apps/*.yaml"
-            exclude: "apps/chart/**"
+          - path: "apps/*"
   template:
     metadata:
       name: 'user-app-{{path.basenameNormalized}}'
@@ -20,7 +19,7 @@ spec:
       source:
         repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
         targetRevision: HEAD
-        path: apps/chart
+        path: charts/webapp
         helm:
           valueFiles:
             - '../../{{path}}'
