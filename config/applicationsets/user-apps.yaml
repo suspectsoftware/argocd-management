@@ -6,7 +6,7 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: 'https://github.com/suspectsoftware/argocd-solution-alpha.git'
+        repoURL: 'https://github.com/suspectsoftware/argocd-team-alpha.git'
         revision: HEAD
         directories:
           - path: "*"
@@ -23,7 +23,7 @@ spec:
           helm:
             valueFiles:
               - '$values/{{path.basename}}/values.yaml'
-        - repoURL: 'https://github.com/suspectsoftware/argocd-solution-alpha.git'
+        - repoURL: 'https://github.com/suspectsoftware/argocd-team-alpha.git'
           targetRevision: HEAD
           ref: values
       destination:
