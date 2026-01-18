@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: projects
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: .
+spec:
+  project: in-cluster
+  source:
+    repoURL: https://github.com/suspectsoftware/argocd-management.git
+    path: config/applications/projects
+    directory:
+      recurse: true
+  destination:
+    name: in-cluster
+    namespace: argocd
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

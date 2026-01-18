@@ -17,3 +17,7 @@ kubectl apply -f bootstrap/repository-secret.yaml
 ```
 
 And we can then apply the root application which in turn creates all underlying applications
+
+```
+kubectl apply -f root/root.yaml
+```

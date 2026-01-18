@@ -7,9 +7,9 @@ spec:
   project: in-cluster
   sources:
     - repoURL: "https://github.com/suspectsoftware/argocd-management.git"
-      path: applicationsets
+      path: config/applicationsets
     - repoURL: "https://github.com/suspectsoftware/argocd-management.git"
-      path: root
+      path: config/root
   destination:
     name: in-cluster
     namespace: argocd
