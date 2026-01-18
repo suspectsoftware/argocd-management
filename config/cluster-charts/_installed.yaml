@@ -1,4 +1,10 @@
 charts:
+  - chart: argo-cd
+    releaseName: argocd
+    namespace: argocd
+    version: "9.3.4"
+    repositoryUrl: "https://argoproj.github.io/argo-helm"
+
   - chart: external-secrets
     version: "1.0.0"
     repositoryUrl: "https://charts.external-secrets.io"
