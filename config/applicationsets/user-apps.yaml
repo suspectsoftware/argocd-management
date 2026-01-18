@@ -12,8 +12,8 @@ spec:
           - path: "apps/*"
   template:
     metadata:
-      name: 'user-app-{{path.filenameNormalized}}'
-      namespace: '{{path.filenameNormalized}}'
+      name: 'user-app-{{path.filename}}'
+      namespace: '{{path.filename}}'
     spec:
       project: team-alpha
       source:
@@ -22,10 +22,10 @@ spec:
         path: charts/webapp
         helm:
           valueFiles:
-            - '../../{{path}}'
+            - '../../{{path}}/{{path.filename}}'
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: 'app-{{path.filenameNormalized}}'
+        namespace: 'app-{{path.filename}}'
       syncPolicy:
         automated:
           prune: true
