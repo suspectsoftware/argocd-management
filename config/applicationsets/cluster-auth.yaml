@@ -8,7 +8,7 @@ metadata:
 spec:
   project: in-cluster
   source:
-    repoURL: "https://github.com/egmontadministration/argo-management-cluster.git"
+    repoURL: "https://github.com/suspectsoftware/argocd-management.git"
     path: config/applications/cluster-auth
   destination:
     name: in-cluster

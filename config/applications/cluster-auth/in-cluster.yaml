@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cluster-secret-platform-services-test
+  name: cluster-secret-in-cluster
   labels:
     argocd.argoproj.io/secret-type: cluster
     environment: production
