@@ -60,7 +60,7 @@ EOF
 And we can then apply the root application which in turn creates all underlying applications
 
 ```
-kubectl apply -f root/root.yaml
+kubectl apply -f config/root/root.yaml
 ```
 
 ## User Apps

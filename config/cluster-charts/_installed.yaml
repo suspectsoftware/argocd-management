@@ -9,9 +9,9 @@ charts:
     version: "1.0.0"
     repositoryUrl: "https://charts.external-secrets.io"
 
-  - chart: cert-manager
-    version: "1.18.2"
-    repositoryUrl: https://charts.jetstack.io
+  # - chart: cert-manager
+  #   version: "1.18.2"
+  #   repositoryUrl: https://charts.jetstack.io
 
   - chart: prometheus
     releaseName: prometheus
@@ -19,8 +19,8 @@ charts:
     version: "27.28.0"
     repositoryUrl: "https://prometheus-community.github.io/helm-charts"
 
-  - chart: gateway-helm
-    releaseName: envoy-gateway
-    namespace: envoy-gateway-system
-    version: "v1.6.1"
-    repositoryUrl: "docker.io/envoyproxy"
+  # - chart: gateway-helm
+  #   releaseName: envoy-gateway
+  #   namespace: envoy-gateway-system
+  #   version: "v1.6.1"
+  #   repositoryUrl: "docker.io/envoyproxy"
