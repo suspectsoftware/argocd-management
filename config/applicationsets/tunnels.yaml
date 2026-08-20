@@ -12,10 +12,10 @@ spec:
         repoURL: https://github.com/suspectsoftware/argocd-management.git
         revision: HEAD
         files:
-          - path: config/tunnels/*.yaml
+          - path: config/tunnels/routes/*.yaml
   template:
     metadata:
-      name: 'tunnel-{{ .name }}'
+      name: tunnel-cloudflared
     spec:
       project: in-cluster
       source:
@@ -39,7 +39,5 @@ spec:
         path: config/tunnels/chart
         helm:
           valuesObject:
-            name: '{{ .name }}'
-            tokenSecretKey: '{{ .tokenSecretKey }}'
             routes:
               {{ .routes | toYaml | nindent 14 }}

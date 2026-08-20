@@ -1,4 +1,4 @@
 name: cloudflared
 replicas: 2
-tokenSecretKey: ""
+tokenSecretKey: argo-cloudflared/tunnel-token
 routes: []
