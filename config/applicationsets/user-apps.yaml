@@ -4,43 +4,33 @@ metadata:
   name: user-apps
   namespace: argocd
 spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
   generators:
     - git:
-        repoURL: 'https://github.com/suspectsoftware/argocd-team-alpha.git'
+        repoURL: https://github.com/suspectsoftware/argocd-applications.git
         revision: HEAD
         directories:
           - path: "*"
   template:
     metadata:
-      name: 'user-app-{{path.basename}}'
-      namespace: 'app-{{path.basename}}'
+      name: 'user-app-{{ .path.basename }}'
     spec:
       project: team-alpha
       sources:
-        - repoURL: 'https://github.com/suspectsoftware/argocd-management.git'
+        - repoURL: https://github.com/suspectsoftware/argocd-management.git
           targetRevision: HEAD
           path: charts/webapp
           helm:
             valueFiles:
-              - '$values/{{path.basename}}/values.yaml'
-        - repoURL: 'https://github.com/suspectsoftware/argocd-team-alpha.git'
+              - '$values/{{ .path.path }}/values.yaml'
+        - repoURL: https://github.com/suspectsoftware/argocd-applications.git
           targetRevision: HEAD
           ref: values
       destination:
-        server: 'https://kubernetes.default.svc'
-        namespace: 'app-{{path.basename}}'
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        syncOptions:
-          - CreateNamespace=true
-        helm:
-          valueFiles:
-            - '../../{{path.basename}}/values.yaml'
-      destination:
-        server: 'https://kubernetes.default.svc'
-        namespace: 'app-{{path.basename}}'
+        name: in-cluster
+        namespace: 'app-{{ .path.basename }}'
       syncPolicy:
         automated:
           prune: true
