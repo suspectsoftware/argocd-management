@@ -1,0 +1,27 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: suspectsoftware-argocd-management
+  namespace: argocd
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: cluster-store
+  target:
+    name: suspectsoftware-argocd-management
+    template:
+      type: Opaque
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      data:
+        githubAppID: "2678288"
+        githubAppInstallationID: "104764666"
+        githubAppPrivateKey: "{{ .appPrivateKey | b64dec | toString }}"
+        type: git
+        url: https://github.com/suspectsoftware/argocd-management.git
+  data:
+    - secretKey: appPrivateKey
+      remoteRef:
+        key: argocd-github-app/private-key

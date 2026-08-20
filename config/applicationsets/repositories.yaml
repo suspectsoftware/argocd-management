@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: repositories
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - git:
+        repoURL: https://github.com/suspectsoftware/argocd-management.git
+        revision: HEAD
+        files:
+          - path: config/repositories/*.yaml
+  template:
+    metadata:
+      name: 'repository-{{ .metadata.name }}'
+    spec:
+      project: in-cluster
+      source:
+        repoURL: https://github.com/suspectsoftware/argocd-management.git
+        targetRevision: HEAD
+        path: config/repositories
+        directory:
+          include: '{{ .path.filename }}'
+      destination:
+        name: in-cluster
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

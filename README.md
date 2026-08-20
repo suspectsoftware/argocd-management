@@ -1,76 +1,74 @@
-# ArgoCD Management
-This repository contains the management state for the ArgoCD cluster.
+# Argo CD Management
 
-## Bootstrapping ArgoCD
-To bootstrap the cluster we first need to install our specific version of ArgoCD using Helm.
+GitOps configuration for the Argo CD cluster.
 
-```
+## Bootstrap
+
+Run these commands from the repository root.
+
+### 1. Install Argo CD
+
+```sh
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 helm upgrade --install argocd argo/argo-cd \
-    --namespace argocd \
-    --version 9.3.4 \
-    --timeout 600s \
-    --create-namespace \
-    --debug \
-    -f config/cluster-charts/argocd.yaml
+  --namespace argocd \
+  --create-namespace \
+  --version 9.3.4 \
+  --timeout 600s \
+  -f config/cluster-charts/argocd.yaml
+
+kubectl rollout status deployment/argocd-server -n argocd --timeout=600s
 ```
 
-After installing ArgoCD we can create the management GitHub repository secret.
+### 2. Add GitHub credentials
 
-```
-kubectl apply -f - << 'EOF'
-apiVersion: v1
-kind: Secret
-metadata:
-  name: suspectsoftware-argocd-management
-  namespace: argocd
-  labels:
-    argocd.argoproj.io/secret-type: repository
-type: Opaque
-stringData:
-  type: git
-  url: https://github.com/suspectsoftware/argocd-management.git
-  githubAppID: "2678288"
-  githubAppInstallationID: "104764666"
-  githubAppPrivateKey: |
-    -----BEGIN RSA PRIVATE KEY-----
-    .,.,.,.,.,.,.,.,.,.,.,.,.,.,.,.
-    -----END RSA PRIVATE KEY-----
-EOF
+The GitHub App must have access to the repositories listed in `config/repositories`.
+Store its base64-encoded private key in the `kubernetes-argocd` 1Password vault as
+the `private-key` field on an `argocd-github-app` item. Bootstrap the management
+repository directly so Argo CD can start reading this repository.
+
+```sh
+kubectl create secret generic suspectsoftware-argocd-management \
+  --namespace argocd \
+  --from-literal=type=git \
+  --from-literal=url=https://github.com/suspectsoftware/argocd-management.git \
+  --from-literal=githubAppID=2678288 \
+  --from-literal=githubAppInstallationID=104764666 \
+  --from-file=githubAppPrivateKey=/path/to/github-app-private-key.pem \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl label secret suspectsoftware-argocd-management \
+  --namespace argocd argocd.argoproj.io/secret-type=repository --overwrite
 ```
 
-Since external secrets is used to retrieve all sensitive data in the cluster, we need to setup the secret to access it.
-In this project we use 1Password which does not have OIDC support, so we need to create the `eso-1password-credentials` secret.
-We can later loop back and manage this secret with external-secrets to make rotation easier.
+### 3. Add 1Password credentials
 
-```
-kubectl apply -f - << 'EOF'
-apiVersion: v1
-kind: Secret
-metadata:
-  name: eso-1password-credentials
-  namespace: external-secrets
-type: Opaque
-stringData:
-  token: <1PASSWORD_SA_TOKEN>
-EOF
+```sh
+kubectl create namespace external-secrets --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic eso-1password-credentials \
+  --namespace external-secrets \
+  --from-literal=token='<1PASSWORD_SA_TOKEN>' \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-And we can then apply the root application which in turn creates all underlying applications
+### 4. Start GitOps
 
-```
+The project and cluster registration are required before the root Application.
+
+```sh
+kubectl apply -f config/projects/in-cluster.yaml
+kubectl apply -n argocd -f config/cluster-auth/in-cluster.yaml
 kubectl apply -f config/root/root.yaml
 ```
 
-## User Apps
+## Add A Repository
 
-I want to use a Helm chart to deploy multiple copies of the same application to my cluster.
-A values file should specify the differences between each deployment.
-In my apps directory i have three example values file, these represent each unique app.
-I want to create an applicationset which creates an argocd application for each values file.
-It should be created in a namespace with the same name as the file, so app-01.yaml becomes app-01 in kubernetes.
-And the name of the application should use the same standard prefixed with user-app.
-the applicationset should be placed in config/applicationsets
-The chart to use is right now apps/chart
-The root dir of my project is /Users/daerjo/Documents/repositories/private/hetzner-argocd/argocd-management
+Add a complete repository `ExternalSecret` YAML file directly under
+`config/repositories`. The `repositories` ApplicationSet creates one Application
+per file.
+
+## Add A Cluster Chart
+
+Add the chart to `config/cluster-charts/_installed.yaml` and add a matching
+`config/cluster-charts/<releaseName>.yaml` values file.
