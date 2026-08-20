@@ -1,0 +1,3 @@
+routes:
+  - hostname: thehice.dk
+    service: http://planner.app-planner.svc.cluster.local:80

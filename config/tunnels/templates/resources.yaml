@@ -25,12 +25,15 @@ metadata:
 data:
   config.yaml: |
     ingress:
-{{- range .Values.routes }}
+{{- range $path, $content := .Files.Glob "routes/*.yaml" }}
+{{- $routeFile := fromYaml (toString $content) }}
+{{- range $routeFile.routes }}
       - hostname: {{ .hostname | quote }}
 {{- with .path }}
         path: {{ . | quote }}
 {{- end }}
         service: {{ .service | quote }}
+{{- end }}
 {{- end }}
       - service: http_status:404
 ---
@@ -46,7 +49,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ toYaml .Values.routes | sha256sum }}
+        checksum/config: {{ (.Files.Glob "routes/*.yaml").AsConfig | sha256sum }}
       labels:
         app: {{ .Values.name }}
     spec:
