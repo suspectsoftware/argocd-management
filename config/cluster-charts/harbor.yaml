@@ -3,7 +3,7 @@ expose:
   tls:
     enabled: false
 
-externalURL: https://harbor.suspectosftware.com
+externalURL: https://harbor.suspectsoftware.com
 
 existingSecretAdminPassword: harbor-secrets
 existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
