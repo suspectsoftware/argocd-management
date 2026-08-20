@@ -57,6 +57,17 @@ kubectl create secret generic eso-1password-credentials \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
+Harbor also needs stable bootstrap secrets:
+
+```sh
+kubectl create namespace harbor --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic harbor-secrets \
+  --namespace harbor \
+  --from-literal=HARBOR_ADMIN_PASSWORD='<HARBOR_ADMIN_PASSWORD>' \
+  --from-literal=secretKey='<16_CHARACTER_KEY>' \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+
 ### 4. Start GitOps
 
 The project and cluster registration are required before the root Application.

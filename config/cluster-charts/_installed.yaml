@@ -19,6 +19,12 @@ charts:
     version: "27.28.0"
     repositoryUrl: "https://prometheus-community.github.io/helm-charts"
 
+  - chart: harbor
+    releaseName: harbor
+    namespace: harbor
+    version: "1.19.2"
+    repositoryUrl: "https://helm.goharbor.io"
+
   # - chart: gateway-helm
   #   releaseName: envoy-gateway
   #   namespace: envoy-gateway-system

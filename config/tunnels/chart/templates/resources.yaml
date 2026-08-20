@@ -45,6 +45,8 @@ spec:
       app: {{ .Values.name }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ toYaml .Values.routes | sha256sum }}
       labels:
         app: {{ .Values.name }}
     spec:

@@ -1,3 +1,5 @@
 routes:
   - hostname: argo.suspectsoftware.com
     service: http://argocd-server.argocd.svc.cluster.local:80
+  - hostname: harbor.suspectosftware.com
+    service: http://harbor.harbor.svc.cluster.local:80
