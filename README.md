@@ -24,9 +24,9 @@ kubectl rollout status deployment/argocd-server -n argocd --timeout=600s
 ### 2. Add GitHub credentials
 
 The GitHub App must have access to the repositories listed in `config/repositories`.
-Store its base64-encoded private key in the `kubernetes-argocd` 1Password vault as
-the `private-key` field on an `argocd-github-app` item. Bootstrap the management
-repository directly so Argo CD can start reading this repository.
+Create its private key Secret manually. Repository ExternalSecrets read this Secret
+through the in-cluster `github-app-store`. Bootstrap the management repository
+directly so Argo CD can start reading this repository.
 
 ```sh
 kubectl create secret generic suspectsoftware-argocd-management \
@@ -40,6 +40,11 @@ kubectl create secret generic suspectsoftware-argocd-management \
 
 kubectl label secret suspectsoftware-argocd-management \
   --namespace argocd argocd.argoproj.io/secret-type=repository --overwrite
+
+kubectl create secret generic argocd-github-app \
+  --namespace argocd \
+  --from-file=githubAppPrivateKey=/path/to/github-app-private-key.pem \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 ### 3. Add 1Password credentials

@@ -6,8 +6,8 @@ metadata:
 spec:
   refreshInterval: 1h
   secretStoreRef:
-    kind: ClusterSecretStore
-    name: cluster-store
+    kind: SecretStore
+    name: github-app-store
   target:
     name: suspectsoftware-argocd-applications
     template:
@@ -18,10 +18,11 @@ spec:
       data:
         githubAppID: "2678288"
         githubAppInstallationID: "104764666"
-        githubAppPrivateKey: "{{ .appPrivateKey | b64dec | toString }}"
+        githubAppPrivateKey: "{{ .appPrivateKey | toString }}"
         type: git
         url: https://github.com/suspectsoftware/argocd-applications.git
   data:
     - secretKey: appPrivateKey
       remoteRef:
-        key: argocd-github-app/private-key
+        key: argocd-github-app
+        property: githubAppPrivateKey
