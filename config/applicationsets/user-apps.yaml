@@ -17,7 +17,7 @@ spec:
     metadata:
       name: 'user-app-{{ .path.basename }}'
     spec:
-      project: team-alpha
+      project: applications
       source:
         repoURL: https://github.com/suspectsoftware/argocd-applications.git
         targetRevision: HEAD
