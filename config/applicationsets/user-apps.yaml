@@ -18,16 +18,12 @@ spec:
       name: 'user-app-{{ .path.basename }}'
     spec:
       project: team-alpha
-      sources:
-        - repoURL: https://github.com/suspectsoftware/argocd-management.git
-          targetRevision: HEAD
-          path: charts/webapp
-          helm:
-            valueFiles:
-              - '$values/{{ .path.path }}/values.yaml'
-        - repoURL: https://github.com/suspectsoftware/argocd-applications.git
-          targetRevision: HEAD
-          ref: values
+      source:
+        repoURL: https://github.com/suspectsoftware/argocd-applications.git
+        targetRevision: HEAD
+        path: '{{ .path.path }}'
+        directory:
+          recurse: true
       destination:
         name: in-cluster
         namespace: 'app-{{ .path.basename }}'
