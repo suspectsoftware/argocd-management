@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tunnels
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - git:
+        repoURL: https://github.com/suspectsoftware/argocd-management.git
+        revision: HEAD
+        files:
+          - path: config/tunnels/*.yaml
+  template:
+    metadata:
+      name: 'tunnel-{{ .name }}'
+    spec:
+      project: in-cluster
+      source:
+        repoURL: https://github.com/suspectsoftware/argocd-management.git
+        targetRevision: HEAD
+        path: config/tunnels/chart
+      destination:
+        name: in-cluster
+        namespace: cloudflared
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+  templatePatch: |
+    spec:
+      source:
+        repoURL: https://github.com/suspectsoftware/argocd-management.git
+        targetRevision: HEAD
+        path: config/tunnels/chart
+        helm:
+          valuesObject:
+            name: '{{ .name }}'
+            tokenSecretKey: '{{ .tokenSecretKey }}'
+            routes:
+              {{ .routes | toYaml | nindent 14 }}

@@ -1,45 +1,52 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cloudflared
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
----
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: tunnel-token
-  namespace: cloudflared
+  name: {{ .Values.name }}-token
 spec:
   refreshInterval: 1h
   secretStoreRef:
     kind: ClusterSecretStore
     name: cluster-store
   target:
-    name: tunnel-token
+    name: {{ .Values.name }}-token
     template:
       type: Opaque
       data:
-        token: "{{ .tunnelToken | toString }}"
+        token: "{{ `{{ .tunnelToken | toString }}` }}"
   data:
     - secretKey: tunnelToken
       remoteRef:
-        key: argo-cloudflared/tunnel-token
+        key: {{ required "tokenSecretKey is required" .Values.tokenSecretKey }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-config
+data:
+  config.yaml: |
+    ingress:
+{{- range .Values.routes }}
+      - hostname: {{ .hostname | quote }}
+{{- with .path }}
+        path: {{ . | quote }}
+{{- end }}
+        service: {{ .service | quote }}
+{{- end }}
+      - service: http_status:404
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudflared
-  namespace: cloudflared
+  name: {{ .Values.name }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: cloudflared
+      app: {{ .Values.name }}
   template:
     metadata:
       labels:
-        app: cloudflared
+        app: {{ .Values.name }}
     spec:
       containers:
         - name: cloudflared
@@ -47,20 +54,24 @@ spec:
           command:
             - cloudflared
             - tunnel
+            - --config
+            - /etc/cloudflared/config.yaml
             - --no-autoupdate
             - --loglevel
             - info
             - --metrics
             - 0.0.0.0:2000
             - run
-            - --url
-            - http://argocd-server.argocd.svc.cluster.local:80
           env:
             - name: TUNNEL_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: tunnel-token
+                  name: {{ .Values.name }}-token
                   key: token
+          volumeMounts:
+            - name: config
+              mountPath: /etc/cloudflared
+              readOnly: true
           livenessProbe:
             httpGet:
               path: /ready
@@ -74,3 +85,7 @@ spec:
               port: 2000
             initialDelaySeconds: 5
             periodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.name }}-config

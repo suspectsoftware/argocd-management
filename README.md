@@ -77,3 +77,8 @@ per file.
 
 Add the chart to `config/cluster-charts/_installed.yaml` and add a matching
 `config/cluster-charts/<releaseName>.yaml` values file.
+
+## Add A Tunnel Route
+
+Edit a file under `config/tunnels` and add a hostname and Kubernetes service to
+its `routes` list. All routes in a file are served by the same Cloudflare Tunnel.

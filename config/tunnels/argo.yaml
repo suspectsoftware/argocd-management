@@ -1,0 +1,5 @@
+name: cloudflared
+tokenSecretKey: argo-cloudflared/tunnel-token
+routes:
+  - hostname: argo.suspectsoftware.com
+    service: http://argocd-server.argocd.svc.cluster.local:80
