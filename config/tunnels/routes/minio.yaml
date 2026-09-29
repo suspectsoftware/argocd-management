@@ -1,3 +1,5 @@
 routes:
   - hostname: s3.suspectsoftware.com
+    service: http://minio.app-minio.svc.cluster.local:9001
+  - hostname: connect.s3.suspectsoftware.com
     service: http://minio.app-minio.svc.cluster.local:9000
